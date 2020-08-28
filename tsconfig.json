@@ -9,7 +9,15 @@
     "experimentalDecorators": true,
     "isolatedModules": true,
     "esModuleInterop": true,
-    "lib": ["dom", "esnext"]
+    "lib": ["dom", "esnext", "ESNext.AsyncIterable"],
+    "baseUrl": ".",
+    "paths": {
+      "/@services/*": ["src/services/*"],
+      "/@components/*": ["src/components/*"]
+    },
+    "importHelpers": true,
+    "sourceMap": true,
+    "types": ["jest"]
   },
   "exclude": ["node_modules", "dist"]
 }

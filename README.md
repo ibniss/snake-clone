@@ -1,13 +1,5 @@
-# Vite Typescript Starter
+# Snake clone
 
-Starter template for Vite + TypeScript project
+Snake game clone to practice TypeScript, play around with Vue3, Vite, Tailwind and learn about game dev patterns.
 
-## Getting Started
-
-1. Clone this repo
-2. `yarn install`
-3. `yarn dev` or `yarn build`
-
-## License
-
-MIT
+The base Entity-Component-System pattern implementation is based on [the tutorial](https://github.com/soloschenko-grigoriy/gamedev-patterns-ts)

@@ -18,6 +18,9 @@ module.exports = {
   plugins: ['prettier'],
   rules: {
     'prettier/prettier': 'error',
+    'import/no-absolute-path': 'off',
+    'no-unused-vars': 'off',
+    'no-useless-constructor': 'off',
     'vue/component-name-in-template-casing': [
       'error',
       'PascalCase',
@@ -40,5 +43,6 @@ module.exports = {
   env: {
     node: true,
     es6: true,
+    jest: true,
   },
 }
