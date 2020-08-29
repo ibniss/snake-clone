@@ -25,7 +25,10 @@ export class CanvasLayer {
   }
 
   private static initCanvas(style: Partial<CSSStyleDeclaration>): Canvas {
-    const size = Settings.grid.tileSize
+    const size =
+      (Settings.grid.tileSize + Settings.grid.tileOffset) *
+        Settings.grid.dimension +
+      Settings.grid.tileOffset
     const canvas = new Canvas(new Vector2D(size, size))
     canvas.awake()
     canvas.setStyle(style)

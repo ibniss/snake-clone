@@ -39,6 +39,7 @@ module.exports = {
         ],
       },
     ],
+    'vue/valid-template-root': 'off',
   },
   env: {
     node: true,
