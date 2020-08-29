@@ -2,7 +2,7 @@ import { Entity, Vector2D } from '/@services/utils'
 import { Tile } from '/@services/tile'
 import { Settings } from '/@services/settings'
 
-export default class Grid extends Entity {
+export class Grid extends Entity {
   private _tiles: Tile[] = []
 
   public get tiles(): Tile[] {

@@ -1,4 +1,4 @@
-import Grid from '../grid/grid'
+import { Grid } from '/@services/grid'
 import { Entity } from '/@services/utils'
 
 export class Game extends Entity {

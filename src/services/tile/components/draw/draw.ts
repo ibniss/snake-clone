@@ -1,5 +1,7 @@
 import { Tile } from '/@services/tile'
+import { CanvasLayer } from '/@services/canvas-layer'
 import { IComponent } from '/@services/utils'
+import { Settings } from '/@services/settings'
 
 export class TileDrawComponent implements IComponent {
   constructor(public entity: Tile) {}
@@ -14,10 +16,14 @@ export class TileDrawComponent implements IComponent {
   }
 
   private draw(): void {
-    // draw background rect
+    CanvasLayer.background.fillRect(
+      this.entity.start,
+      this.entity.size,
+      Settings.grid.color
+    )
   }
 
   private clear(): void {
-    // clear background rect
+    CanvasLayer.background.clearRect(this.entity.start, this.entity.size)
   }
 }
