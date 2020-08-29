@@ -24,7 +24,6 @@ export class Canvas implements IAwake {
   constructor(public readonly size: Vector2D) {}
 
   public awake(): void {
-    // for now just appending it at the end
     const canvas = document.createElement('canvas')
     canvas.setAttribute('width', `${this.size.x}px`)
     canvas.setAttribute('height', `${this.size.y}px`)

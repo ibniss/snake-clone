@@ -3,34 +3,13 @@ import { IComponent } from './component'
 
 class E extends Entity {}
 class C1 implements IComponent {
-  public entity: E = new E()
-  public awake(): void {
-    /* ... */
-  }
-
-  public update(): void {
-    /* ... */
-  }
+  name = 'c1'
 }
 class C2 implements IComponent {
-  public entity: E = new E()
-  public awake(): void {
-    /* ... */
-  }
-
-  public update(): void {
-    /* ... */
-  }
+  name = 'c2'
 }
 class C3 implements IComponent {
-  public entity: E = new E()
-  public awake(): void {
-    /* ... */
-  }
-
-  public update(): void {
-    /* ... */
-  }
+  name = 'c3'
 }
 
 describe('>>> Entity', () => {
@@ -69,46 +48,5 @@ describe('>>> Entity', () => {
   it("should throw error if component wasn't found", () => {
     expect(e.hasComponent(C1)).toBeFalsy()
     expect(() => e.getComponent(C1)).toThrow()
-  })
-
-  it('should awake all components', () => {
-    const spy1 = jest.spyOn(c1, 'awake')
-    const spy2 = jest.spyOn(c2, 'awake')
-    const spy3 = jest.spyOn(c3, 'awake')
-
-    expect(spy1).not.toBeCalled()
-    expect(spy2).not.toBeCalled()
-    expect(spy3).not.toBeCalled()
-
-    e.addComponent(c1)
-    e.addComponent(c2)
-    e.addComponent(c3)
-
-    e.awake()
-
-    expect(spy1).toBeCalled()
-    expect(spy2).toBeCalled()
-    expect(spy3).toBeCalled()
-  })
-
-  it('should update all components', () => {
-    const spy1 = jest.spyOn(c1, 'update')
-    const spy2 = jest.spyOn(c2, 'update')
-    const spy3 = jest.spyOn(c3, 'update')
-
-    expect(spy1).not.toBeCalled()
-    expect(spy2).not.toBeCalled()
-    expect(spy3).not.toBeCalled()
-
-    e.addComponent(c1)
-    e.addComponent(c2)
-    e.addComponent(c3)
-
-    const deltaTime = 12
-    e.update(deltaTime)
-
-    expect(spy1).toBeCalledWith(deltaTime)
-    expect(spy2).toBeCalledWith(deltaTime)
-    expect(spy3).toBeCalledWith(deltaTime)
   })
 })

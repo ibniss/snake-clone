@@ -1,13 +1,22 @@
-import { IAwake, IUpdate } from '/@services/utils'
 import { IComponent } from './component'
 
-type constr<T> = { new (...args: unknown[]): T }
+type Constructor<T extends IComponent> = new (...args: any[]) => T
+type EntityChangeListener = (entity: Entity) => any
 
 /**
- * This is an abstract entity class - a simple container for components.
+ * This is the entity class - a simple container for components, a 'bag of components'.
+ * The entity is described by the components in it
  */
-export abstract class Entity implements IAwake, IUpdate {
-  protected _components: IComponent[] = []
+export class Entity {
+  private _components: IComponent[] = []
+  private _listeners: EntityChangeListener[] = []
+
+  public id: number
+  public static nextId = 1
+
+  constructor() {
+    this.id = Entity.nextId++
+  }
 
   public get components(): IComponent[] {
     return this._components
@@ -15,7 +24,7 @@ export abstract class Entity implements IAwake, IUpdate {
 
   public addComponent(component: IComponent): void {
     this._components.push(component)
-    component.entity = this
+    this._listeners.forEach(l => l(this))
   }
 
   /**
@@ -23,7 +32,7 @@ export abstract class Entity implements IAwake, IUpdate {
    *
    * @param constr constructor of a component to find
    */
-  public getComponent<C extends IComponent>(constr: constr<C>): C {
+  public getComponent<C extends IComponent>(constr: Constructor<C>): C {
     const comp = this._components.find(c => c instanceof constr)
 
     if (comp === undefined) {
@@ -40,13 +49,13 @@ export abstract class Entity implements IAwake, IUpdate {
    *
    * @param constr constructor of a component to remove
    */
-  public removeComponent<C extends IComponent>(constr: constr<C>): void {
+  public removeComponent<C extends IComponent>(constr: Constructor<C>): void {
     const comp = this._components.find(c => c instanceof constr)
 
     // if found, remove the connection to entity and remove component
     if (comp) {
-      comp.entity = null
       this._components.splice(this._components.indexOf(comp), 1)
+      this._listeners.forEach(l => l(this))
     }
   }
 
@@ -55,25 +64,33 @@ export abstract class Entity implements IAwake, IUpdate {
    *
    * @param constr constructor of a component to find
    */
-  public hasComponent<C extends IComponent>(constr: constr<C>): boolean {
+  public hasComponent<C extends IComponent>(constr: Constructor<C>): boolean {
     return !!this._components.find(c => c instanceof constr)
   }
 
   /**
-   * Awake the entity - calls awake for all components.
-   * Called at the very start of the game loop.
+   * Adds a listener to the entity when components are added or removed.
+   *
+   * @param listener The listener to add
    */
-  public awake(): void {
-    this._components.forEach(component => component.awake())
+  addListener(listener: EntityChangeListener) {
+    const index = this._listeners.indexOf(listener)
+    if (index === -1) {
+      this._listeners.push(listener)
+    }
+    return this
   }
 
   /**
-   * Update the entity - calls update for all components.
-   * Called during each game loop cycle.
+   * Removes a listener from the entity.
    *
-   * @param deltaTime time passed since last update
+   * @param listener The listener to remove.
    */
-  public update(deltaTime: number): void {
-    this._components.forEach(component => component.update(deltaTime))
+  removeListener(listener: EntityChangeListener) {
+    const index = this._listeners.indexOf(listener)
+    if (index !== -1) {
+      this._listeners.splice(index, 1)
+    }
+    return this
   }
 }

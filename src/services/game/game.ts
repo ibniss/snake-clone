@@ -1,45 +1,50 @@
-import { Grid } from '/@services/grid'
-import { Entity } from '/@services/utils'
+import {
+  ColorComponent,
+  PositionComponent,
+  Shape,
+  ShapeComponent,
+} from '../components'
+import { Settings } from '../settings'
+import { RenderSystem } from '../systems/render'
+import { Entity, log, Vector2D, Engine } from '/@services/utils'
 
-export class Game extends Entity {
+/**
+ * This is a class which initialises the game and runs the engine.
+ */
+export class Game {
   private _lastTimestamp = 0
 
-  private _entities: Entity[] = []
+  constructor(
+    loggingEnabled: boolean = false,
+    private _engine: Engine = new Engine()
+  ) {
+    Settings.logsEnabled = loggingEnabled
+    log('Constructing game...')
+    _engine.addSystem(new RenderSystem(0, _engine))
 
-  public get entities(): Entity[] {
-    return this._entities
+    const testEntity = new Entity()
+    testEntity.addComponent(new PositionComponent(new Vector2D(100, 100)))
+    testEntity.addComponent(new ShapeComponent(Shape.CIRCLE, 10))
+    testEntity.addComponent(new ColorComponent('rgba(240, 60, 50, 0)'))
+    _engine.addEntity(testEntity)
   }
 
-  public awake(): void {
-    super.awake()
-
-    // instantiate grid, add initial entities
-    const grid = new Grid()
-    this._entities.push(grid)
-
-    // awake all children
-    this.entities.forEach(e => e.awake())
-
-    // start update loop
-    window.requestAnimationFrame(() => {
-      this._lastTimestamp = Date.now()
-      this.update()
-    })
-  }
-
-  public update(): void {
-    const deltaTime = (Date.now() - this._lastTimestamp) / 1000
-
-    // update all components
-    super.update(deltaTime)
-
-    // update all children
-    this.entities.forEach(e => e.update(deltaTime))
-
-    // update timestamp
+  /**
+   * Start the game - awake the engine and start game loop.
+   */
+  public start() {
+    log('Starting engine...')
+    this._engine.awake()
     this._lastTimestamp = Date.now()
+    this.run()
+  }
 
-    // invoke next frame
-    window.requestAnimationFrame(() => this.update())
+  /**
+   * The game loop
+   */
+  private run() {
+    const deltaTime = (Date.now() - this._lastTimestamp) / 1000
+    this._engine.update(deltaTime)
+    window.requestAnimationFrame(() => this.run())
   }
 }

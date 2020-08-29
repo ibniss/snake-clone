@@ -14,4 +14,5 @@ module.exports = {
   restoreMocks: true,
   testMatch: ['**/*.test.(js|ts)'],
   roots: ['<rootDir>/src'],
+  setupFilesAfterEnv: ['jest-extended'],
 }
