@@ -1,4 +1,5 @@
 import { Vector2D, Canvas } from '/@services/utils'
+import { Settings } from '/@services/settings'
 
 export class CanvasLayer {
   private static _background: Canvas
@@ -24,7 +25,7 @@ export class CanvasLayer {
   }
 
   private static initCanvas(style: Partial<CSSStyleDeclaration>): Canvas {
-    const size = 9 // TODO: get from settings
+    const size = Settings.grid.tileSize
     const canvas = new Canvas(new Vector2D(size, size))
     canvas.awake()
     canvas.setStyle(style)

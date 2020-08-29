@@ -29,8 +29,8 @@ export default class Grid extends Entity {
    * Initialise the tiles on the grid.
    */
   private initTiles(): void {
-    const size = Settings.grid.nodeSize
-    const offset = Settings.grid.nodeOffset
+    const size = Settings.grid.tileSize
+    const offset = Settings.grid.tileOffset
     for (let y = 0; y < Settings.grid.dimension; y++) {
       for (let x = 0; x < Settings.grid.dimension; x++) {
         const start = new Vector2D(
