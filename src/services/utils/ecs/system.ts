@@ -31,5 +31,5 @@ export abstract class System implements IUpdate {
    *
    * @param deltaTime time passed since last update
    */
-  abstract update(deltaTime: number): void
+  abstract update(deltaTime?: number): void
 }

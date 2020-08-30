@@ -1,5 +1,5 @@
 import { Engine, EngineEntityListener } from '../engine'
-import { IComponent, Entity } from '/@services/utils'
+import { IComponent, Entity, log } from '/@services/utils'
 
 type Constructor<T extends IComponent> = new (...args: any[]) => T
 
@@ -26,6 +26,7 @@ export class Family implements EngineEntityListener {
    */
   onEntityAdded(entity: Entity): void {
     if (!this._entities.includes(entity)) {
+      log('Entity added to family:', entity)
       this._entities.push(entity)
       this._needsRefresh = true
       entity.addListener(this.onEntityChanged)
@@ -53,7 +54,7 @@ export class Family implements EngineEntityListener {
    *
    * @param entity entity that changed
    */
-  onEntityChanged(entity: Entity): void {
+  onEntityChanged = (entity: Entity) => {
     if (!this._entities.includes(entity)) {
       this._entities.push(entity)
       entity.addListener(this.onEntityChanged)

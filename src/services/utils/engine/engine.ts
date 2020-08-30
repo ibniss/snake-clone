@@ -9,8 +9,11 @@ export class Engine implements IAwake, IUpdate {
   private _systemsNeedSorting: boolean = false
 
   private _entities: Entity[] = []
-  private _systems: System[] = []
   private _entityListeners: EngineEntityListener[] = []
+
+  private _inputSystem: System | undefined
+  private _systems: System[] = []
+  private _renderSystem: System | undefined
 
   /**
    * Adds a listener for when entities are added or removed.
@@ -85,11 +88,26 @@ export class Engine implements IAwake, IUpdate {
    *
    * @param system system to add
    */
-  addSystem(system: System) {
-    if (!this._systems.includes(system)) {
-      log('Adding system:', system.constructor.name)
-      this._systems.push(system)
-      this._systemsNeedSorting = true
+  addSystem(system: System, type: 'input' | 'render' | 'other') {
+    switch (type) {
+      case 'input': {
+        log('Adding input system:', system.constructor.name)
+        this._inputSystem = system
+        break
+      }
+      case 'render': {
+        log('Adding render system:', system.constructor.name)
+        this._renderSystem = system
+        break
+      }
+      case 'other': {
+        if (!this._systems.includes(system)) {
+          log('Adding other system:', system.constructor.name)
+          this._systems.push(system)
+          this._systemsNeedSorting = true
+        }
+        break
+      }
     }
 
     return this
@@ -120,17 +138,33 @@ export class Engine implements IAwake, IUpdate {
    */
   public awake(): void {
     this.sortSystemsIfRequired()
+    this._inputSystem?.awake()
     this._systems.forEach(s => s.awake())
+    this._renderSystem?.awake()
   }
 
   /**
-   * Update all systems added to the engine
+   * Call the input processing system.
+   */
+  public processInput(): void {
+    this._inputSystem?.update()
+  }
+
+  /**
+   * Update all other systems added to the engine
    *
    * @param deltaTime time elapsed since last update
    */
   public update(deltaTime: number): void {
     this.sortSystemsIfRequired()
     this._systems.forEach(s => s.update(deltaTime))
+  }
+
+  /**
+   * Call the rendering system.
+   */
+  public render(): void {
+    this._renderSystem?.update()
   }
 
   /**

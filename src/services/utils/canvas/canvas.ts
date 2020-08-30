@@ -48,6 +48,21 @@ export class Canvas implements IAwake {
     this.context.fill()
   }
 
+  public drawRect(
+    start: Vector2D,
+    size: Vector2D,
+    color: string,
+    strokeWidth: number
+  ): void {
+    const previousWidth = this.context.lineWidth
+    this.context.lineWidth = strokeWidth
+    this.context.beginPath()
+    this.context.strokeStyle = color
+    this.context.rect(start.x, start.y, size.x, size.y)
+    this.context.stroke()
+    this.context.lineWidth = previousWidth
+  }
+
   public fillCircle(center: Vector2D, radius: number, color: string): void {
     this.context.beginPath()
     this.context.arc(center.x, center.y, radius, 0, Math.PI * 2)

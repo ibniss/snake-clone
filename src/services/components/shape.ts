@@ -1,12 +1,22 @@
 import { IComponent } from '../utils'
 
-export enum Shape {
-  SQUARE,
-  CIRCLE,
+type SquareShape = {
+  type: 'square'
+  side: number
 }
+type CircleShape = {
+  type: 'circle'
+  radius: number
+}
+type EmptySquareShape = {
+  type: 'empty_square'
+  side: number
+  borderWidth: number
+}
+export type Shape = SquareShape | CircleShape | EmptySquareShape
 
 export class ShapeComponent implements IComponent {
   name = 'shape'
 
-  constructor(public shape: Shape = Shape.SQUARE, public size: number = 0) {}
+  constructor(public shape: Shape = { type: 'square', side: 0 }) {}
 }

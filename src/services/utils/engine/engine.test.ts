@@ -44,8 +44,8 @@ describe('>>> Engine', () => {
     expect(spy1).not.toBeCalled()
     expect(spy2).not.toBeCalled()
 
-    engine.addSystem(s1)
-    engine.addSystem(s2)
+    engine.addSystem(s1, 'other')
+    engine.addSystem(s2, 'other')
 
     engine.awake()
 
@@ -60,8 +60,8 @@ describe('>>> Engine', () => {
     expect(spy1).not.toBeCalled()
     expect(spy2).not.toBeCalled()
 
-    engine.addSystem(s1)
-    engine.addSystem(s2)
+    engine.addSystem(s1, 'other')
+    engine.addSystem(s2, 'other')
 
     engine.update(0)
 
@@ -74,8 +74,8 @@ describe('>>> Engine', () => {
     s1 = new S1(1, engine)
     s2 = new S2(0, engine)
 
-    engine.addSystem(s1)
-    engine.addSystem(s2)
+    engine.addSystem(s1, 'other')
+    engine.addSystem(s2, 'other')
 
     engine.awake()
 
@@ -88,8 +88,8 @@ describe('>>> Engine', () => {
     s1 = new S1(1, engine)
     s2 = new S2(0, engine)
 
-    engine.addSystem(s1)
-    engine.addSystem(s2)
+    engine.addSystem(s1, 'other')
+    engine.addSystem(s2, 'other')
 
     engine.update(0)
 
