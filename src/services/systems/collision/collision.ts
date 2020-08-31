@@ -1,13 +1,19 @@
-import { System, Family, Engine, Vector2D } from '/@services/utils'
+import { System, Family, Engine, Vector2D, Entity } from '/@services/utils'
 import {
   PositionComponent,
   DrawableComponent,
   CollidableComponent,
   Shape,
   MovableComponent,
+  FrameCollisionComponent,
+  CollideTag,
 } from '/@services/components'
-import { Settings } from '../settings'
+import { Settings } from '/@services/settings'
 
+/**
+ * Checks for collisions between movable objects and collidable elements the object can collide with.
+ * Adds FrameCollisionComponent to the entity
+ */
 export class CollisionSystem extends System {
   private _family: Family
 
@@ -35,7 +41,7 @@ export class CollisionSystem extends System {
         if (collidable.collidesWith.includes('border')) {
           const collidesWithBorder = this._checkBorderCollision(shape, position)
           if (collidesWithBorder) {
-            console.log(collidable.tag, 'border')
+            this._addFrameCollision(entity, collidable.tag, 'border')
           }
         }
 
@@ -65,10 +71,25 @@ export class CollisionSystem extends System {
           )
 
           if (collides) {
-            console.log(collidable.tag, collideTag)
+            this._addFrameCollision(entity, collidable.tag, collideTag)
           }
         })
       })
+  }
+
+  /**
+   * Add a frame collision to a given entity
+   *
+   * @param entity entity to add the collision to
+   * @param a tag of element A
+   * @param b tag of element B
+   */
+  private _addFrameCollision(entity: Entity, a: CollideTag, b: CollideTag) {
+    if (entity.hasComponent(FrameCollisionComponent)) {
+      entity.getComponent(FrameCollisionComponent).collisions.push({ a, b })
+    } else {
+      entity.addComponent(new FrameCollisionComponent([{ a, b }]))
+    }
   }
 
   /**

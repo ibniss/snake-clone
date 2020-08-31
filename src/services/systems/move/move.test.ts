@@ -1,5 +1,6 @@
 import { MoveSystem } from './move'
 import {
+  DrawableComponent,
   EntityChainComponent,
   MovableComponent,
   PositionComponent,
@@ -26,6 +27,7 @@ describe('>>> Move system', () => {
     entity.addComponent(position)
     movable = new MovableComponent(10, 0)
     entity.addComponent(movable)
+    entity.addComponent(new DrawableComponent({ type: 'circle', radius: 10 }))
 
     system = new MoveSystem(0, engine)
     engine.addSystem(system, 'other')

@@ -1,6 +1,5 @@
-import { IComponent } from './component'
+import { IComponent, Constructor } from './component'
 
-type Constructor<T extends IComponent> = new (...args: any[]) => T
 type EntityChangeListener = (entity: Entity) => any
 
 /**

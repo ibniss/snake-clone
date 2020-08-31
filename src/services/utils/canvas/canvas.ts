@@ -1,6 +1,5 @@
 import { IAwake, Vector2D } from '/@services/utils'
 import { Settings } from '/@services/settings'
-import { bezierCurveThrough } from './bezier-multipoint'
 
 export class Canvas implements IAwake {
   private _elm: HTMLCanvasElement | undefined

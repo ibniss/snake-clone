@@ -1,7 +1,5 @@
 import { Engine, EngineEntityListener } from '../engine'
-import { IComponent, Entity, log } from '/@services/utils'
-
-type Constructor<T extends IComponent> = new (...args: any[]) => T
+import { IComponent, Entity, log, Constructor } from '/@services/utils'
 
 export class Family implements EngineEntityListener {
   private _needsRefresh: boolean
