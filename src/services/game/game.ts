@@ -7,18 +7,26 @@ import {
   CollidableComponent,
 } from '../components'
 import { Settings } from '../settings'
+import { CleanupSystem } from '../systems/cleanup'
 import {
   InputSystem,
   RenderSystem,
   CollisionSystem,
   MoveSystem,
 } from '/@services/systems'
-import { Entity, log, Vector2D, Engine } from '/@services/utils'
+import {
+  Entity,
+  log,
+  Vector2D,
+  Engine,
+  StatusChangeListener,
+  GameStatus,
+} from '/@services/utils'
 
 /**
  * This is a class which initialises the game and runs the engine.
  */
-export class Game {
+export class Game implements StatusChangeListener {
   private _lastTimestamp = 0
   private _deltaTime = 0
 
@@ -28,15 +36,19 @@ export class Game {
 
   private _fpsUpdateListener: Function | undefined
 
+  public onStatusChange = (status: GameStatus): void => {}
+
   constructor(
     loggingEnabled: boolean = false,
     private _engine: Engine = new Engine()
   ) {
     Settings.logsEnabled = loggingEnabled
     log('Constructing game...')
+    _engine.addStatusChangeListener(this)
     _engine.addSystem(new InputSystem(0, _engine), 'input')
     _engine.addSystem(new MoveSystem(1, _engine), 'other')
     _engine.addSystem(new CollisionSystem(2, _engine), 'other')
+    _engine.addSystem(new CleanupSystem(3, _engine), 'other')
     _engine.addSystem(new RenderSystem(0, _engine), 'render')
 
     // Add the border as an entity
@@ -58,7 +70,7 @@ export class Game {
     _engine.addEntity(borderEntity)
 
     const chainPositions = []
-    for (let i = 1; i <= 5; i++) {
+    for (let i = 1; i <= 10; i++) {
       const chainEntity = new Entity()
       const chainPosition = new PositionComponent(
         new Vector2D(100 - 10 * i, 200)
@@ -82,14 +94,6 @@ export class Game {
     testEntity.addComponent(new ControllableComponent())
     testEntity.addComponent(new CollidableComponent('head', ['food', 'border']))
     _engine.addEntity(testEntity)
-
-    const testEntity2 = new Entity()
-    testEntity2.addComponent(new PositionComponent(new Vector2D(200, 200)))
-    testEntity2.addComponent(
-      new DrawableComponent({ type: 'circle', radius: 10 })
-    )
-    testEntity2.addComponent(new CollidableComponent('food', []))
-    _engine.addEntity(testEntity2)
   }
 
   /**
@@ -102,11 +106,27 @@ export class Game {
   }
 
   /**
+   * Set a function as status change listener
+   *
+   * @param func function to call when status changes
+   */
+  public setOnStatusUpdate(func: (status: GameStatus) => void) {
+    this.onStatusChange = func
+  }
+
+  /**
+   * Prepare the game - awake the engine
+   */
+  public prepare(): void {
+    log('Preparing engine...')
+    this._engine.awake()
+  }
+
+  /**
    * Start the game - awake the engine and start game loop.
    */
-  public start() {
+  public start(): void {
     log('Starting engine...')
-    this._engine.awake()
     window.requestAnimationFrame(num => this.run(num))
   }
 
@@ -114,6 +134,10 @@ export class Game {
    * The game loop
    */
   private run(timestamp: DOMHighResTimeStamp): void {
+    if (this._engine.status === 'lost') {
+      return
+    }
+
     // Throttle frame rate
     if (timestamp < this._lastTimestamp + Settings.timestep) {
       window.requestAnimationFrame(num => this.run(num))

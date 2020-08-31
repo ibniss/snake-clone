@@ -1,8 +1,14 @@
 import { Entity, IUpdate, IAwake, System, log } from '/@services/utils'
 
+export type GameStatus = 'not running' | 'running' | 'lost'
+
 export interface EngineEntityListener {
   onEntityAdded(entity: Entity): void
   onEntityRemoved(entity: Entity): void
+}
+
+export interface StatusChangeListener {
+  onStatusChange(status: GameStatus): void
 }
 
 export class Engine implements IAwake, IUpdate {
@@ -14,6 +20,23 @@ export class Engine implements IAwake, IUpdate {
   private _inputSystem: System | undefined
   private _systems: System[] = []
   private _renderSystem: System | undefined
+
+  private _status: GameStatus = 'not running'
+  private _statusChangeListener: StatusChangeListener | undefined = undefined
+
+  public get status() {
+    return this._status
+  }
+
+  /**
+   * Add a listener for when game status changes
+   *
+   * @param listener listener to add
+   */
+  addStatusChangeListener(listener: StatusChangeListener) {
+    this._statusChangeListener = listener
+    return this
+  }
 
   /**
    * Adds a listener for when entities are added or removed.
@@ -134,6 +157,16 @@ export class Engine implements IAwake, IUpdate {
   }
 
   /**
+   * Change the game status. Invokes the handler
+   *
+   * @param status new status to set
+   */
+  public changeStatus(status: GameStatus) {
+    this._status = status
+    this._statusChangeListener?.onStatusChange(status)
+  }
+
+  /**
    * Initialise all the sytems
    */
   public awake(): void {
@@ -141,6 +174,7 @@ export class Engine implements IAwake, IUpdate {
     this._inputSystem?.awake()
     this._systems.forEach(s => s.awake())
     this._renderSystem?.awake()
+    this.changeStatus('running')
   }
 
   /**

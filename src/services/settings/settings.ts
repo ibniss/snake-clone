@@ -5,12 +5,12 @@ export const Settings = {
   grid: {
     dimension: 600,
     backgroundColor: '#4a5568',
-    borderColor: '#2f855a',
+    borderColor: '#9ae6b4',
     borderWidth: 10,
   },
   rootSelector: '#canvasParent',
   logsEnabled: false,
   movement: {
-    angleStep: 90,
+    angleStep: 10,
   },
 }
