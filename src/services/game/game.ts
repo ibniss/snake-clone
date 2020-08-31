@@ -1,9 +1,9 @@
 import {
-  ColorComponent,
+  ControllableComponent,
   EntityChainComponent,
   MovableComponent,
   PositionComponent,
-  ShapeComponent,
+  DrawableComponent,
 } from '../components'
 import { Settings } from '../settings'
 import {
@@ -25,6 +25,8 @@ export class Game {
   private _fps = 0
   private _framesThisSecond = 0
 
+  private _numFrames = 0
+
   private _fpsUpdateListener: Function | undefined
 
   constructor(
@@ -45,28 +47,40 @@ export class Game {
       new PositionComponent(new Vector2D(size / 2, size / 2))
     )
     borderEntity.addComponent(
-      new ShapeComponent({
-        type: 'empty_square',
-        side: size,
-        borderWidth: Settings.grid.borderWidth,
-      })
+      new DrawableComponent(
+        {
+          type: 'empty_square',
+          side: size,
+          borderWidth: Settings.grid.borderWidth,
+        },
+        Settings.grid.borderColor
+      )
     )
-    borderEntity.addComponent(new ColorComponent(Settings.grid.borderColor))
     _engine.addEntity(borderEntity)
 
-    const chainEntity = new Entity()
-    const chainPosition = new PositionComponent(new Vector2D(50, 100))
-    chainEntity.addComponent(chainPosition)
-    chainEntity.addComponent(new ShapeComponent({ type: 'circle', radius: 20 }))
-    chainEntity.addComponent(new ColorComponent('red'))
-    _engine.addEntity(chainEntity)
+    const chainPositions = []
+    for (let i = 1; i <= 10; i++) {
+      const chainEntity = new Entity()
+      const chainPosition = new PositionComponent(
+        new Vector2D(100 - 10 * i, 200)
+      )
+      chainEntity.addComponent(chainPosition)
+      chainPositions.push(chainPosition)
+      chainEntity.addComponent(
+        new DrawableComponent({ type: 'circle', radius: 10 })
+      )
+      _engine.addEntity(chainEntity)
+    }
 
     const testEntity = new Entity()
-    testEntity.addComponent(new PositionComponent(new Vector2D(100, 200)))
-    testEntity.addComponent(new ShapeComponent({ type: 'circle', radius: 20 }))
-    testEntity.addComponent(new ColorComponent('red'))
-    testEntity.addComponent(new MovableComponent(20, 0))
-    testEntity.addComponent(new EntityChainComponent([chainPosition]))
+    const position = new PositionComponent(new Vector2D(100, 200))
+    testEntity.addComponent(position)
+    testEntity.addComponent(
+      new DrawableComponent({ type: 'circle', radius: 10 })
+    )
+    testEntity.addComponent(new MovableComponent(120, 0))
+    testEntity.addComponent(new EntityChainComponent(chainPositions))
+    testEntity.addComponent(new ControllableComponent())
     _engine.addEntity(testEntity)
   }
 
@@ -112,6 +126,8 @@ export class Game {
 
     // PROCESS INPUT
     this._engine.processInput()
+
+    // TODO: fix velocity issues at lower timestep
 
     // UPDATE
     let updateStepsCount = 0

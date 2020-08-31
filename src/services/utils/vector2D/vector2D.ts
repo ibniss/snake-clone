@@ -14,27 +14,24 @@ export class Vector2D {
   }
 
   /**
-   * Multiply the vector by a scalar
-   *
-   * @param scalar scalar to multiply by
-   * @returns the vector after multiplication
+   * Subtract two vectors
    */
-  public times(scalar: number): Vector2D {
-    this.x *= scalar
-    this.y *= scalar
-    return this
+  public static subtract(a: Vector2D, b: Vector2D): Vector2D {
+    return new Vector2D(a.x - b.x, a.y - b.y)
   }
 
   /**
-   * Divide the vector by a scalar
-   *
-   * @param scalar scalar to divide by
-   * @returns the vector after division
+   * Multiply a vector by a scalar
    */
-  public divideBy(scalar: number): Vector2D {
-    this.x /= scalar
-    this.y /= scalar
-    return this
+  public static times(vector: Vector2D, scalar: number): Vector2D {
+    return new Vector2D(vector.x * scalar, vector.y * scalar)
+  }
+
+  /**
+   * Divide a vector by a scalar
+   */
+  public divideBy(vector: Vector2D, scalar: number): Vector2D {
+    return new Vector2D(vector.x / scalar, vector.y / scalar)
   }
 
   /**
@@ -42,5 +39,23 @@ export class Vector2D {
    */
   public get length(): number {
     return Math.sqrt(this.x ** 2 + this.y ** 2)
+  }
+
+  /**
+   * Normalise the vector
+   * @returns the vector after normalisation
+   */
+  public normalise(): Vector2D {
+    const length = this.length
+    this.x /= length
+    this.y /= length
+    return this
+  }
+
+  /**
+   * Get a new vector with the same values
+   */
+  public clone(): Vector2D {
+    return new Vector2D(this.x, this.y)
   }
 }

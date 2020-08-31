@@ -6,7 +6,7 @@
 import { Game } from '/@services/game'
 import { onMounted, ref } from 'vue'
 
-const game = ref<Game>(new Game(true))
+const game = ref<Game>(new Game())
 export const fps = ref<number>(0)
 game.value.setOnFpsUpdate((num: number) => (fps.value = num))
 onMounted(() => game.value.start())

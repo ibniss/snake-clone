@@ -1,9 +1,9 @@
 import { Settings } from '../settings'
 import { CanvasLayer } from '../utils/canvas-layer'
 import {
-  ColorComponent,
+  DrawableComponent,
+  EntityChainComponent,
   PositionComponent,
-  ShapeComponent,
 } from '/@services/components'
 import { Family, System, Engine, Vector2D, log } from '/@services/utils'
 
@@ -16,7 +16,7 @@ export class RenderSystem extends System {
     log('Creating RenderSystem family...')
     this._family = new Family(
       _engine,
-      [PositionComponent, ShapeComponent, ColorComponent],
+      [PositionComponent, DrawableComponent],
       [],
       []
     )
@@ -46,8 +46,7 @@ export class RenderSystem extends System {
 
     // draw entities
     this._family.entities.forEach(entity => {
-      const shape = entity.getComponent(ShapeComponent).shape
-      const { color } = entity.getComponent(ColorComponent)
+      const { color, shape } = entity.getComponent(DrawableComponent)
       const { position } = entity.getComponent(PositionComponent)
 
       switch (shape.type) {
@@ -75,6 +74,17 @@ export class RenderSystem extends System {
             color,
             shape.borderWidth
           )
+          break
+        case 'line_point':
+          if (entity.hasComponent(EntityChainComponent)) {
+            CanvasLayer.foreground.drawMultipointLine(
+              entity
+                .getComponent(EntityChainComponent)
+                .positionComponents.map(p => p.position),
+              color,
+              shape.lineWidth
+            )
+          }
           break
       }
     })

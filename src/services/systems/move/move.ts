@@ -2,6 +2,7 @@ import {
   MovableComponent,
   PositionComponent,
   EntityChainComponent,
+  DrawableComponent,
 } from '/@services/components'
 import { System, Engine, Family, Vector2D, Entity } from '/@services/utils'
 
@@ -26,16 +27,26 @@ export class MoveSystem extends System {
    */
   public update(deltaTime: number): void {
     this._family.entities.forEach(entity => {
-      const newPosition = this._moveEntity(deltaTime, entity)
+      const [newPosition, moveVector] = this._moveEntity(deltaTime, entity)
 
       // if entity has a chain of other components, update their positions too
       if (entity.hasComponent(EntityChainComponent)) {
-        let moveTo = newPosition
-        const { positionComponents } = entity.getComponent(EntityChainComponent)
-        const { velocity } = entity.getComponent(MovableComponent)
+        const chain = entity.getComponent(EntityChainComponent)
+        const drawable = entity.getComponent(DrawableComponent)
 
-        positionComponents.forEach(comp => {
-          moveTo = this._moveTowards(deltaTime, velocity, comp, moveTo)
+        let moveTo = newPosition.clone()
+
+        chain.positionComponents.forEach(comp => {
+          const difference = Vector2D.subtract(moveTo, comp.position)
+          const distance = difference.length
+
+          // don't move if too close
+          if (distance > drawable.minDistance) {
+            const orientation = difference.normalise()
+            moveTo = comp.position
+              .add(Vector2D.times(orientation, moveVector.length))
+              .clone()
+          }
         })
       }
     })
@@ -46,44 +57,14 @@ export class MoveSystem extends System {
    *
    * @param deltaTime time elapsed in ms
    * @param entity entity to update position of
-   * @returns new position of the entity
+   * @returns the new position and move vector
    */
-  private _moveEntity(deltaTime: number, entity: Entity): Vector2D {
+  private _moveEntity(deltaTime: number, entity: Entity): [Vector2D, Vector2D] {
     const { velocity, angle } = entity.getComponent(MovableComponent)
 
-    const deltaVector = this._getMovementVector(deltaTime, velocity, angle)
-    const newPosition = entity
-      .getComponent(PositionComponent)
-      .position.add(deltaVector)
-
-    return newPosition
-  }
-
-  /**
-   * Move a given component towards a point with a given velocity
-   *
-   * @param deltaTime time elapsed in ms
-   * @param component position component to apply the movement to
-   * @param moveTo position to move towards
-   * @returns new position of the moved component
-   */
-  private _moveTowards(
-    deltaTime: number,
-    velocity: number,
-    component: PositionComponent,
-    moveTo: Vector2D
-  ): Vector2D {
-    // get the angle between the vector x->y and x axis
-    const angle =
-      (Math.atan2(
-        moveTo.y - component.position.y,
-        moveTo.x - component.position.x
-      ) *
-        180) /
-      Math.PI
-    return component.position.add(
-      this._getMovementVector(deltaTime, velocity, angle)
-    )
+    const moveVector = this._getMovementVector(deltaTime, velocity, angle)
+    const { position } = entity.getComponent(PositionComponent)
+    return [position.add(moveVector), moveVector]
   }
 
   /**
@@ -100,9 +81,19 @@ export class MoveSystem extends System {
     angle: number
   ): Vector2D {
     const time = deltaTime / 1000
-    const deltaX = Math.cos((angle * Math.PI) / 180) * time * velocity
-    const deltaY = Math.sin((angle * Math.PI) / 180) * time * velocity
+    const radians = this._degreesToRadians(angle)
+    const deltaX = Math.cos(radians) * time * velocity
+    const deltaY = Math.sin(radians) * time * velocity
 
     return new Vector2D(deltaX, deltaY)
+  }
+
+  /**
+   * Change degrees to radians
+   *
+   * @param degrees
+   */
+  private _degreesToRadians(degrees: number): number {
+    return (degrees * Math.PI) / 180
   }
 }

@@ -1,5 +1,6 @@
-import { ControllableComponent } from '/@services/components'
-import { Engine, System, Family } from '/@services/utils'
+import { Settings } from '../settings'
+import { ControllableComponent, MovableComponent } from '/@services/components'
+import { Engine, System, Family, Entity } from '/@services/utils'
 
 export class InputSystem extends System {
   private _eventQueue: KeyboardEvent[] = []
@@ -9,7 +10,12 @@ export class InputSystem extends System {
   constructor(_priority: number, _engine: Engine) {
     super(_priority, _engine)
 
-    this._family = new Family(_engine, [ControllableComponent], [], [])
+    this._family = new Family(
+      _engine,
+      [ControllableComponent, MovableComponent],
+      [],
+      []
+    )
   }
 
   /**
@@ -27,8 +33,33 @@ export class InputSystem extends System {
    * Process all events in the input queue
    */
   update(): void {
-    let currentEvent: KeyboardEvent | undefined
+    this._family.entities.forEach(entity => {
+      while (this._eventQueue.length !== 0) {
+        this._handleEvent(entity, this._eventQueue.shift()!)
+      }
+    })
+  }
 
-    // TODO: process the event queue
+  /**
+   * Handle an event and apply the result to the entity
+   *
+   * @param entity entity to apply the event result to
+   * @param event event to handle
+   */
+  private _handleEvent(entity: Entity, event: KeyboardEvent) {
+    const movable = entity.getComponent(MovableComponent)
+
+    switch (event.key) {
+      case 'ArrowLeft':
+      case 'KeyA':
+        movable.angle -= Settings.movement.angleStep
+        break
+      case 'ArrowRight':
+      case 'KeyD':
+        movable.angle += Settings.movement.angleStep
+        break
+      default:
+        throw new Error(`No handler for key ${event.key}!`)
+    }
   }
 }
