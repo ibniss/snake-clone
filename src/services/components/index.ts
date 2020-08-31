@@ -1,5 +1,5 @@
 export * from './position'
-export * from './collision'
+export * from './collidable'
 export * from './movable'
 export * from './entity-chain'
 export * from './controllable'

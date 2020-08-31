@@ -11,6 +11,6 @@ export const Settings = {
   rootSelector: '#canvasParent',
   logsEnabled: false,
   movement: {
-    angleStep: 10,
+    angleStep: 90,
   },
 }

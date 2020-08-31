@@ -53,6 +53,16 @@ export class Vector2D {
   }
 
   /**
+   * Get the absolute values of the vector
+   * @returns the vector
+   */
+  public absolute(): Vector2D {
+    this.x = Math.abs(this.x)
+    this.y = Math.abs(this.y)
+    return this
+  }
+
+  /**
    * Get a new vector with the same values
    */
   public clone(): Vector2D {

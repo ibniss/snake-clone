@@ -4,6 +4,7 @@ import {
   MovableComponent,
   PositionComponent,
   DrawableComponent,
+  CollidableComponent,
 } from '../components'
 import { Settings } from '../settings'
 import {
@@ -24,8 +25,6 @@ export class Game {
   private _lastFpsUpdate = 0
   private _fps = 0
   private _framesThisSecond = 0
-
-  private _numFrames = 0
 
   private _fpsUpdateListener: Function | undefined
 
@@ -59,7 +58,7 @@ export class Game {
     _engine.addEntity(borderEntity)
 
     const chainPositions = []
-    for (let i = 1; i <= 10; i++) {
+    for (let i = 1; i <= 5; i++) {
       const chainEntity = new Entity()
       const chainPosition = new PositionComponent(
         new Vector2D(100 - 10 * i, 200)
@@ -81,7 +80,16 @@ export class Game {
     testEntity.addComponent(new MovableComponent(120, 0))
     testEntity.addComponent(new EntityChainComponent(chainPositions))
     testEntity.addComponent(new ControllableComponent())
+    testEntity.addComponent(new CollidableComponent('head', ['food', 'border']))
     _engine.addEntity(testEntity)
+
+    const testEntity2 = new Entity()
+    testEntity2.addComponent(new PositionComponent(new Vector2D(200, 200)))
+    testEntity2.addComponent(
+      new DrawableComponent({ type: 'circle', radius: 10 })
+    )
+    testEntity2.addComponent(new CollidableComponent('food', []))
+    _engine.addEntity(testEntity2)
   }
 
   /**
@@ -126,8 +134,6 @@ export class Game {
 
     // PROCESS INPUT
     this._engine.processInput()
-
-    // TODO: fix velocity issues at lower timestep
 
     // UPDATE
     let updateStepsCount = 0
