@@ -8,6 +8,8 @@ import {
 } from '../components'
 import { Settings } from '../settings'
 import { CleanupSystem } from '../systems/cleanup'
+import { DeadSystem } from '../systems/dead'
+import { CanvasLayer } from '../utils/canvas-layer'
 import {
   InputSystem,
   RenderSystem,
@@ -44,13 +46,28 @@ export class Game implements StatusChangeListener {
   ) {
     Settings.logsEnabled = loggingEnabled
     log('Constructing game...')
-    _engine.addStatusChangeListener(this)
-    _engine.addSystem(new InputSystem(0, _engine), 'input')
-    _engine.addSystem(new MoveSystem(1, _engine), 'other')
-    _engine.addSystem(new CollisionSystem(2, _engine), 'other')
-    _engine.addSystem(new CleanupSystem(3, _engine), 'other')
-    _engine.addSystem(new RenderSystem(0, _engine), 'render')
+    this._setupEngine(_engine)
+    this._setupEntities()
+  }
 
+  /**
+   * Setup the engine and the systems
+   */
+  private _setupEngine(engine: Engine) {
+    this._engine = engine
+    this._engine.addStatusChangeListener(this)
+    this._engine.addSystem(new InputSystem(0, this._engine), 'input')
+    this._engine.addSystem(new MoveSystem(1, this._engine), 'other')
+    this._engine.addSystem(new CollisionSystem(2, this._engine), 'other')
+    this._engine.addSystem(new DeadSystem(3, this._engine), 'other')
+    this._engine.addSystem(new CleanupSystem(4, this._engine), 'other')
+    this._engine.addSystem(new RenderSystem(0, this._engine), 'render')
+  }
+
+  /**
+   * Setup entities required for the initial game state
+   */
+  private _setupEntities() {
     // Add the border as an entity
     const borderEntity = new Entity()
     const size = Settings.grid.dimension
@@ -67,7 +84,7 @@ export class Game implements StatusChangeListener {
         Settings.grid.borderColor
       )
     )
-    _engine.addEntity(borderEntity)
+    this._engine.addEntity(borderEntity)
 
     const chainPositions = []
     for (let i = 1; i <= 10; i++) {
@@ -80,7 +97,7 @@ export class Game implements StatusChangeListener {
       chainEntity.addComponent(
         new DrawableComponent({ type: 'circle', radius: 10 })
       )
-      _engine.addEntity(chainEntity)
+      this._engine.addEntity(chainEntity)
     }
 
     const testEntity = new Entity()
@@ -93,7 +110,7 @@ export class Game implements StatusChangeListener {
     testEntity.addComponent(new EntityChainComponent(chainPositions))
     testEntity.addComponent(new ControllableComponent())
     testEntity.addComponent(new CollidableComponent('head', ['food', 'border']))
-    _engine.addEntity(testEntity)
+    this._engine.addEntity(testEntity)
   }
 
   /**
@@ -112,6 +129,17 @@ export class Game implements StatusChangeListener {
    */
   public setOnStatusUpdate(func: (status: GameStatus) => void) {
     this.onStatusChange = func
+  }
+
+  /**
+   * Restarts the game
+   */
+  public restart(): void {
+    CanvasLayer.destroy()
+    this._setupEngine(new Engine())
+    this._setupEntities()
+    this.prepare()
+    this.start()
   }
 
   /**

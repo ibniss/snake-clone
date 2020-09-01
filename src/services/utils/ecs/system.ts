@@ -10,7 +10,7 @@ import { IUpdate } from '/@services/utils'
  * getting processed by a given system
  */
 export abstract class System implements IUpdate {
-  constructor(private _priority: number, private readonly _engine: Engine) {}
+  constructor(private _priority: number, protected readonly _engine: Engine) {}
 
   public get priority() {
     return this._priority

@@ -21,10 +21,11 @@ export class Canvas implements IAwake {
     return this._ctx
   }
 
-  constructor(public readonly size: Vector2D) {}
+  constructor(public readonly size: Vector2D, private readonly _id: string) {}
 
   public awake(): void {
     const canvas = document.createElement('canvas')
+    canvas.setAttribute('id', this._id)
     canvas.setAttribute('width', `${this.size.x}px`)
     canvas.setAttribute('height', `${this.size.y}px`)
     document.querySelector(Settings.rootSelector)?.appendChild(canvas)

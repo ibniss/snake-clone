@@ -2,11 +2,18 @@
   <p>{{ fps.toFixed(0) }} FPS</p>
   <p>Game status: {{ status }}</p>
   <button
-    class="px-6 py-2 bg-green-500 text-white rounded-md"
-    @click="game.start()"
+    class="px-6 py-2 bg-green-500 focus:outline-none focus:shadow-outline text-white rounded-md"
+    @click="start"
   >
     Start
   </button>
+  <button
+    class="px-6 py-2 bg-yellow-500 focus:outline-none focus:shadow-outline text-white rounded-md"
+    @click="restart"
+  >
+    Restart
+  </button>
+
   <div id="canvasParent" class="relative"></div>
 </template>
 <script lang="ts" setup>
@@ -22,6 +29,14 @@ onMounted(() => {
   game.value.setOnStatusUpdate((s: GameStatus) => (status.value = s))
   game.value.prepare()
 })
+
+export const start = () => {
+  game.value.start()
+}
+
+export const restart = () => {
+  game.value.restart()
+}
 </script>
 <style>
 canvas {
