@@ -8,13 +8,8 @@ type CircleShape = {
   type: 'circle'
   radius: number
 }
-type EmptySquareShape = {
-  type: 'empty_square'
-  side: number
-  borderWidth: number
-}
 
-export type Shape = SquareShape | CircleShape | EmptySquareShape
+export type Shape = SquareShape | CircleShape
 
 export class DrawableComponent implements IComponent {
   name = 'drawable'
@@ -30,7 +25,6 @@ export class DrawableComponent implements IComponent {
   public get minDistance() {
     switch (this.shape.type) {
       case 'square':
-      case 'empty_square':
         return this.shape.side / 2
       case 'circle':
         return this.shape.radius

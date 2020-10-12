@@ -8,7 +8,7 @@ describe('>>> Canvas', () => {
   let parent: HTMLElement
 
   beforeEach(() => {
-    canvas = new Canvas(size)
+    canvas = new Canvas(size, 'test')
     parent = document.createElement('div')
     parent.id = Settings.rootSelector.replace('#', '')
     document.body.append(parent)

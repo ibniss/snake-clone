@@ -8,13 +8,14 @@ import {
 } from '../components'
 import { Settings } from '../settings'
 import { CleanupSystem } from '../systems/cleanup'
-import { DeadSystem } from '../systems/dead'
+import { DeadSystem } from '../systems/dead/dead'
 import { CanvasLayer } from '../utils/canvas-layer'
 import {
   InputSystem,
   RenderSystem,
   CollisionSystem,
   MoveSystem,
+  FoodSystem,
 } from '/@services/systems'
 import {
   Entity,
@@ -60,7 +61,8 @@ export class Game implements StatusChangeListener {
     this._engine.addSystem(new MoveSystem(1, this._engine), 'other')
     this._engine.addSystem(new CollisionSystem(2, this._engine), 'other')
     this._engine.addSystem(new DeadSystem(3, this._engine), 'other')
-    this._engine.addSystem(new CleanupSystem(4, this._engine), 'other')
+    this._engine.addSystem(new FoodSystem(4, this._engine), 'other')
+    this._engine.addSystem(new CleanupSystem(5, this._engine), 'other')
     this._engine.addSystem(new RenderSystem(0, this._engine), 'render')
   }
 
@@ -68,24 +70,6 @@ export class Game implements StatusChangeListener {
    * Setup entities required for the initial game state
    */
   private _setupEntities() {
-    // Add the border as an entity
-    const borderEntity = new Entity()
-    const size = Settings.grid.dimension
-    borderEntity.addComponent(
-      new PositionComponent(new Vector2D(size / 2, size / 2))
-    )
-    borderEntity.addComponent(
-      new DrawableComponent(
-        {
-          type: 'empty_square',
-          side: size,
-          borderWidth: Settings.grid.borderWidth,
-        },
-        Settings.grid.borderColor
-      )
-    )
-    this._engine.addEntity(borderEntity)
-
     const chainPositions = []
     for (let i = 1; i <= 10; i++) {
       const chainEntity = new Entity()
@@ -97,6 +81,9 @@ export class Game implements StatusChangeListener {
       chainEntity.addComponent(
         new DrawableComponent({ type: 'circle', radius: 10 })
       )
+      if (i > 2) {
+        chainEntity.addComponent(new CollidableComponent('body', []))
+      }
       this._engine.addEntity(chainEntity)
     }
 
@@ -109,7 +96,9 @@ export class Game implements StatusChangeListener {
     testEntity.addComponent(new MovableComponent(120, 0))
     testEntity.addComponent(new EntityChainComponent(chainPositions))
     testEntity.addComponent(new ControllableComponent())
-    testEntity.addComponent(new CollidableComponent('head', ['food', 'border']))
+    testEntity.addComponent(
+      new CollidableComponent('head', ['body', 'border', 'food'])
+    )
     this._engine.addEntity(testEntity)
   }
 

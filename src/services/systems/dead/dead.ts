@@ -15,7 +15,9 @@ export class DeadSystem extends System {
       const { collisions } = entity.getComponent(FrameCollisionComponent)
 
       const isDead = collisions.some(
-        collision => collision.a === 'head' && collision.b === 'border'
+        collision =>
+          collision.a === 'head' &&
+          (collision.b === 'border' || collision.b === 'body')
       )
       if (isDead) {
         this._engine.changeStatus('lost')

@@ -9,6 +9,7 @@ import {
 
 export class CleanupSystem extends System {
   private _family: Family
+  // at the end of each update cycle remove these components from entities
   private readonly _cleanUpComponents: Constructor<IComponent>[] = [
     FrameCollisionComponent,
   ]

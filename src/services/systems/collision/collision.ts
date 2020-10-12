@@ -41,7 +41,7 @@ export class CollisionSystem extends System {
         if (collidable.collidesWith.includes('border')) {
           const collidesWithBorder = this._checkBorderCollision(shape, position)
           if (collidesWithBorder) {
-            this._addFrameCollision(entity, collidable.tag, 'border')
+            this._addFrameCollision(entity, collidable.tag, 'border', 0)
           }
         }
 
@@ -71,7 +71,12 @@ export class CollisionSystem extends System {
           )
 
           if (collides) {
-            this._addFrameCollision(entity, collidable.tag, collideTag)
+            this._addFrameCollision(
+              entity,
+              collidable.tag,
+              collideTag,
+              collideEntity.id
+            )
           }
         })
       })
@@ -84,11 +89,18 @@ export class CollisionSystem extends System {
    * @param a tag of element A
    * @param b tag of element B
    */
-  private _addFrameCollision(entity: Entity, a: CollideTag, b: CollideTag) {
+  private _addFrameCollision(
+    entity: Entity,
+    a: CollideTag,
+    b: CollideTag,
+    collidedWith: number
+  ) {
     if (entity.hasComponent(FrameCollisionComponent)) {
-      entity.getComponent(FrameCollisionComponent).collisions.push({ a, b })
+      entity
+        .getComponent(FrameCollisionComponent)
+        .collisions.push({ a, b, collidedWith })
     } else {
-      entity.addComponent(new FrameCollisionComponent([{ a, b }]))
+      entity.addComponent(new FrameCollisionComponent([{ a, b, collidedWith }]))
     }
   }
 
