@@ -1,4 +1,7 @@
-import { FrameCollisionComponent } from '/@services/components'
+import {
+  FoodEatenComponent,
+  FrameCollisionComponent,
+} from '/@services/components'
 import {
   Engine,
   Family,
@@ -12,6 +15,7 @@ export class CleanupSystem extends System {
   // at the end of each update cycle remove these components from entities
   private readonly _cleanUpComponents: Constructor<IComponent>[] = [
     FrameCollisionComponent,
+    FoodEatenComponent,
   ]
 
   constructor(_priority: number, _engine: Engine) {

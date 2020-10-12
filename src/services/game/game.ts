@@ -16,6 +16,7 @@ import {
   CollisionSystem,
   MoveSystem,
   FoodSystem,
+  ScoreSystem,
 } from '/@services/systems'
 import {
   Entity,
@@ -40,6 +41,7 @@ export class Game implements StatusChangeListener {
   private _fpsUpdateListener: Function | undefined
 
   public onStatusChange = (status: GameStatus): void => {}
+  public onScoreChange = (score: number): void => {}
 
   constructor(
     loggingEnabled: boolean = false,
@@ -57,12 +59,14 @@ export class Game implements StatusChangeListener {
   private _setupEngine(engine: Engine) {
     this._engine = engine
     this._engine.addStatusChangeListener(this)
+    this._engine.addScoreChangeListener(this)
     this._engine.addSystem(new InputSystem(0, this._engine), 'input')
     this._engine.addSystem(new MoveSystem(1, this._engine), 'other')
     this._engine.addSystem(new CollisionSystem(2, this._engine), 'other')
     this._engine.addSystem(new DeadSystem(3, this._engine), 'other')
     this._engine.addSystem(new FoodSystem(4, this._engine), 'other')
-    this._engine.addSystem(new CleanupSystem(5, this._engine), 'other')
+    this._engine.addSystem(new ScoreSystem(5, this._engine), 'other')
+    this._engine.addSystem(new CleanupSystem(6, this._engine), 'other')
     this._engine.addSystem(new RenderSystem(0, this._engine), 'render')
   }
 
@@ -118,6 +122,15 @@ export class Game implements StatusChangeListener {
    */
   public setOnStatusUpdate(func: (status: GameStatus) => void) {
     this.onStatusChange = func
+  }
+
+  /**
+   * Set a function as score change listener
+   *
+   * @param func function to call when score changes
+   */
+  public setOnScoreUpdate(func: (score: number) => void) {
+    this.onScoreChange = func
   }
 
   /**

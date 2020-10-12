@@ -11,6 +11,10 @@ export interface StatusChangeListener {
   onStatusChange(status: GameStatus): void
 }
 
+export interface ScoreChangeListener {
+  onScoreChange(score: number): void
+}
+
 export class Engine implements IAwake, IUpdate {
   private _systemsNeedSorting: boolean = false
 
@@ -24,6 +28,9 @@ export class Engine implements IAwake, IUpdate {
   private _status: GameStatus = 'not running'
   private _statusChangeListener: StatusChangeListener | undefined = undefined
 
+  private _score: number = 0
+  private _scoreChangeListener: ScoreChangeListener | undefined = undefined
+
   public get status() {
     return this._status
   }
@@ -35,6 +42,16 @@ export class Engine implements IAwake, IUpdate {
    */
   addStatusChangeListener(listener: StatusChangeListener) {
     this._statusChangeListener = listener
+    return this
+  }
+
+  /**
+   * Add a listener for when the score changes
+   *
+   * @param listener listener to add
+   */
+  addScoreChangeListener(listener: ScoreChangeListener) {
+    this._scoreChangeListener = listener
     return this
   }
 
@@ -167,10 +184,23 @@ export class Engine implements IAwake, IUpdate {
   }
 
   /**
+   * Increment the score by n
+   */
+  public incrementScore(n = 1) {
+    this._score += n
+    this._scoreChangeListener?.onScoreChange(this._score)
+  }
+
+  /**
    * Initialise all the sytems
    */
   public awake(): void {
     this.sortSystemsIfRequired()
+
+    // reset score and trigger the score listener
+    this._score = 0
+    this._scoreChangeListener?.onScoreChange(this._score)
+
     this._inputSystem?.awake()
     this._systems.forEach(s => s.awake())
     this._renderSystem?.awake()
